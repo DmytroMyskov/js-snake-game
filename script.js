@@ -9,12 +9,21 @@ const cellSize = width / boardSize;
 const food = [2, 2];
 const snake = [[4, 4], [4, 5], [4, 6], [5, 6], [6, 6]];
 let direction = 'right';
+let moved = false;
 const movements = {
   right: [1, 0],
   down: [0, 1],
   left: [-1, 0],
   up: [0, -1]
-}
+};
+const opposite = {
+  right: 'left',
+  down: 'up',
+  left: 'right',
+  up: 'down'
+};
+
+onkeydown = handleKeys
 
 render();
 requestAnimationFrame(animate);
@@ -59,24 +68,25 @@ function animate(now) {
 
 function update(dt) {
   update.leftover ||= {}
-  {
-    update.leftover.food ||= 0
-    const time = dt + update.leftover.food
-    const shift = Math.floor(time / stepInterval)
-    update.leftover.food = time % stepInterval
-    food[1] += shift
+  update.leftover.snake ||= 0
+  const time = dt + update.leftover.snake
+  const shift = Math.floor(time / stepInterval)
+  update.leftover.snake = time % stepInterval
+
+  for (let i = 0; i < shift; i++) {
+    const [x, y] = snake.at(-1)
+    const movement = movements[direction]
+    const [dx, dy] = movement
+    snake.push([x + dx, y + dy])
+    snake.shift()
+    moved = true
   }
-  {
-    update.leftover.snake ||= 0
-    const time = dt + update.leftover.snake
-    const shift = Math.floor(time / stepInterval)
-    update.leftover.snake = time % stepInterval
-    for (let i = 0; i < shift; i++) {
-      const [x, y] = snake.at(-1)
-      const movement = movements[direction]
-      const [dx, dy] = movement
-      snake.push([x + dx, y + dy])
-      snake.shift()
-    }
+}
+
+function handleKeys({ key }) {
+  const dir = key.replace('Arrow', '').toLowerCase()
+  if (dir in movements && dir != opposite[direction] && moved) {
+    direction = dir
+    moved = false
   }
 }
