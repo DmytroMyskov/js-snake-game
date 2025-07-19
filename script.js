@@ -80,6 +80,7 @@ function update(dt) {
     const [dx, dy] = movement
     const head = [x + dx, y + dy];
     const report = recon(head)
+
     switch (report) {
       case "empty":
         snake.push(head)
